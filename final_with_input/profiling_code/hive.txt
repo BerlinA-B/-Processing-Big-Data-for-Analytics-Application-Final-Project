@@ -1,0 +1,48 @@
+# getting deserializer from github
+wget https://github.com/KhareS/Twitter-Data-Analysis-Using-Flume-Hive/blob/master/lib/hive-serdes-1.0-SNAPSHOT.jar;
+
+add jar hive-serdes-1.0-SNAPSHOT.jar;
+
+create database final;
+
+use final;
+
+create table tweets (
+id BIGINT,
+created_at STRING,
+source STRING,
+favorited BOOLEAN,
+retweeted_status STRUCT<
+    text:STRING,
+    user:STRUCT<screen_name:STRING,name:STRING>,
+    retweet_count:INT>,
+entities STRUCT<
+    urls:ARRAY<STRUCT<expanded_url:STRING>>,
+    user_mentions:ARRAY<STRUCT<screen_name:STRING,name:STRING>>,
+    hashtags:ARRAY<STRUCT<text:STRING>>>,
+text STRING,
+    user STRUCT<
+    screen_name:STRING,
+    name:STRING,
+    friends_count:INT,
+    followers_count:INT,
+    statuses_count:INT,
+    verified:BOOLEAN,
+    utc_offset:INT,
+    time_zone:STRING>,
+    in_reply_to_screen_name STRING
+    ) 
+row format serde 'com.cloudera.hive.serde.JSONSerDe';
+
+describe formatted tweets;
+
+load data local inpath '/home/htn279/tweets-final';
+
+# To count records
+select count(*) from tweets;
+
+# To see what each tweet look like
+select * from tweets limit 1;
+
+
+
